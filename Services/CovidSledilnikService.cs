@@ -18,6 +18,7 @@ namespace CovidSledilnik.Services
     {
         IEnumerable<Cases> FromToDate(string region, DateTime fromDate, DateTime toDate);
         IEnumerable<LastWeek> FromLastWeek();
+        bool ValidateCredentials(string username, string password);
     }
 
     public class CovidSledilnikService : ICovidSledilnikService
@@ -128,5 +129,9 @@ namespace CovidSledilnik.Services
                 _streamReader = new StreamReader(resp.GetResponseStream());
                 _csvReader = new CsvReader(_streamReader, CultureInfo.InvariantCulture);
             }
-        }
+            public bool ValidateCredentials(string username, string password)
+            {
+                return username.Equals("admin") && password.Equals("admin");
+            }
+    }
     }

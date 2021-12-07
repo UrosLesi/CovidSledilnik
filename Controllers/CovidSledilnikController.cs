@@ -1,5 +1,6 @@
 ﻿using CovidSledilnik.Models;
 using CovidSledilnik.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
@@ -29,6 +30,7 @@ namespace CovidSledilnik.Controllers
         /// <param name="fromDate"></param>
         /// <param name="toDate"></param>
         /// <returns></returns>
+        [Authorize]
         [HttpGet("region/cases")]
         public IActionResult GetFromToDate([BindRequired, FromQuery(Name = "Regions: LJ, CE, KR, NM, KK, KP, MB, MS, NG, PO, SG, ZA")] string region,
             [BindRequired, FromQuery] DateTime fromDate,
@@ -47,6 +49,7 @@ namespace CovidSledilnik.Controllers
         /// On this endpoint User gets a data from CSV file for last seven days and the are order descendingly.
         /// </summary>
         /// <returns></returns>
+        [Authorize]
         [HttpGet("region/lastweek")]
         public IEnumerable<LastWeek> GetFromLastWeek()
         {
