@@ -17,8 +17,7 @@ namespace CovidSledilnik.Services
     public interface ICovidSledilnikService
     {
         IEnumerable<Cases> FromToDate(string region, DateTime fromDate, DateTime toDate);
-        IEnumerable<LastWeek> FromLastWeek();
-        bool ValidateCredentials(string username, string password);
+        IEnumerable<LastWeekRegion> FromLastWeek();
     }
 
     public class CovidSledilnikService : ICovidSledilnikService
@@ -63,7 +62,7 @@ namespace CovidSledilnik.Services
             return cases;
 
         }
-        public IEnumerable<LastWeek> FromLastWeek()
+        public IEnumerable<LastWeekRegion> FromLastWeek()
         {
             var results = new List<LastWeek>();
             _csvReader.Read();
@@ -103,35 +102,76 @@ namespace CovidSledilnik.Services
             int count = results.Count();
             var resultWeekAgo = results.ElementAt(count - 8);
             var resultToday = results.ElementAt(count - 1);
-            var lastWeekActive = new List<LastWeek>();
-            lastWeekActive.Add(new LastWeek()
+            var lastWeekActive = new List<LastWeekRegion>();
+            lastWeekActive.Add(new LastWeekRegion()
             {
-                LjActiveCases = resultToday.LjActiveCases - resultWeekAgo.LjActiveCases,
-                CeActiveCases = resultToday.CeActiveCases - resultWeekAgo.CeActiveCases,
-                KrActiveCases = resultToday.KrActiveCases - resultWeekAgo.KrActiveCases,
-                NmActiveCases = resultToday.NmActiveCases - resultWeekAgo.NmActiveCases,
-                KkActiveCases = resultToday.KkActiveCases - resultWeekAgo.KkActiveCases,
-                KpActiveCases = resultToday.KpActiveCases - resultWeekAgo.KpActiveCases,
-                MbActiveCases = resultToday.MbActiveCases - resultWeekAgo.MbActiveCases,
-                MsActiveCases = resultToday.MsActiveCases - resultWeekAgo.MsActiveCases,
-                NgActiveCases = resultToday.NgActiveCases - resultWeekAgo.NgActiveCases,
-                PoActiveCases = resultToday.PoActiveCases - resultWeekAgo.PoActiveCases,
-                SgActiveCases = resultToday.SgActiveCases - resultWeekAgo.SgActiveCases,
-                ZaActiveCases = resultToday.ZaActiveCases - resultWeekAgo.ZaActiveCases,
+                Region = "LJ",
+                ActiveCases = resultToday.LjActiveCases - resultWeekAgo.LjActiveCases,
             });
-            return lastWeekActive;
+            lastWeekActive.Add(new LastWeekRegion()
+            {
+                Region = "CE",
+                ActiveCases = resultToday.CeActiveCases - resultWeekAgo.CeActiveCases,
+            });
+            lastWeekActive.Add(new LastWeekRegion()
+            {
+                Region = "KR",
+                ActiveCases = resultToday.KrActiveCases - resultWeekAgo.KrActiveCases,
+            });
+            lastWeekActive.Add(new LastWeekRegion()
+            {
+                Region = "NM",
+                ActiveCases = resultToday.NmActiveCases - resultWeekAgo.NmActiveCases,
+            });
+            lastWeekActive.Add(new LastWeekRegion()
+            {
+                Region = "KK",
+                ActiveCases = resultToday.KkActiveCases - resultWeekAgo.KkActiveCases,
+            });
+            lastWeekActive.Add(new LastWeekRegion()
+            {
+                Region = "KP",
+                ActiveCases = resultToday.KpActiveCases - resultWeekAgo.KpActiveCases,
+            });
+            lastWeekActive.Add(new LastWeekRegion()
+            {
+                Region = "MB",
+                ActiveCases = resultToday.MbActiveCases - resultWeekAgo.MbActiveCases,
+            });
+            lastWeekActive.Add(new LastWeekRegion()
+            {
+                Region = "MS",
+                ActiveCases = resultToday.MsActiveCases - resultWeekAgo.MsActiveCases,
+            });
+            lastWeekActive.Add(new LastWeekRegion()
+            {
+                Region = "NG",
+                ActiveCases = resultToday.NgActiveCases - resultWeekAgo.NgActiveCases,
+            });
+            lastWeekActive.Add(new LastWeekRegion()
+            {
+                Region = "PO",
+                ActiveCases = resultToday.PoActiveCases - resultWeekAgo.PoActiveCases,
+            });
+            lastWeekActive.Add(new LastWeekRegion()
+            {
+                Region = "SG",
+                ActiveCases = resultToday.SgActiveCases - resultWeekAgo.SgActiveCases,
+            });
+            lastWeekActive.Add(new LastWeekRegion()
+            {
+                Region = "ZA",
+                ActiveCases = resultToday.ZaActiveCases - resultWeekAgo.ZaActiveCases,
+            });
+            return lastWeekActive.OrderByDescending(x => x.ActiveCases).ToList();
         }
-            private void GetCSV()
-            {
-                HttpWebRequest req = (HttpWebRequest)WebRequest.Create(_appSettings.URL);
-                HttpWebResponse resp = (HttpWebResponse)req.GetResponse();
+        private void GetCSV()
+        {
+            HttpWebRequest req = (HttpWebRequest)WebRequest.Create(_appSettings.URL);
+            HttpWebResponse resp = (HttpWebResponse)req.GetResponse();
 
-                _streamReader = new StreamReader(resp.GetResponseStream());
-                _csvReader = new CsvReader(_streamReader, CultureInfo.InvariantCulture);
-            }
-            public bool ValidateCredentials(string username, string password)
-            {
-                return username.Equals("admin") && password.Equals("admin");
-            }
+            _streamReader = new StreamReader(resp.GetResponseStream());
+            _csvReader = new CsvReader(_streamReader, CultureInfo.InvariantCulture);
+        }
     }
-    }
+}
