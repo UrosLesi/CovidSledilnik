@@ -6,7 +6,7 @@ password: indigolabs
 
 API is working with the latest data avalible online from Slovenian webpage where we can find official statistics.
 URL for file in use can be modified in appsettings.json.
-API has two endpoints CovidSledilnik/region/cases and CovidSledilnik/region/lastweek.
+API has two endpoints api/region/cases and api/region/lastweek.
 Endpoint cases supports three query parameters: region, fromDate and toDate and returns:
 - Date
 - Region
@@ -16,5 +16,6 @@ Endpoint cases supports three query parameters: region, fromDate and toDate and 
 - Deceased to date
 
 For the time frame and region selected, all three parameters are requiered.
+Avalible regions can be modified in appsettings.json.
 
 On endpoint lastweek we get resultset that contains a list of regions with sum of active cases from the last week.
