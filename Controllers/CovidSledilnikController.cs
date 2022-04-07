@@ -15,12 +15,14 @@ namespace CovidSledilnik.Controllers
     [Route("api/region")]
     public class CovidSledilnikController : ControllerBase
     {
+
         private ICovidSledilnikService _covidSledilnikService;
 
         public CovidSledilnikController(ICovidSledilnikService covidSledilnikService)
         {
             _covidSledilnikService = covidSledilnikService;
         }
+
         /// <summary>
         /// On this endpoint User gets data from specific time frame and based on region that he specified.
         /// </summary>
@@ -34,9 +36,7 @@ namespace CovidSledilnik.Controllers
         [HttpGet("cases")]
         [ProducesResponseType(typeof(IEnumerable<Cases>), 200)]
         [ProducesResponseType(500)]
-        public IEnumerable<Cases> GetFromToDate([BindRequired,FromQuery] string region,
-            [BindRequired, FromQuery] DateTime fromDate,
-            [BindRequired, FromQuery] DateTime toDate)
+        public IEnumerable<Cases> GetFromToDate([BindRequired] string region, DateTime? fromDate, DateTime? toDate)
         {
             return _covidSledilnikService.FromToDate(region, fromDate, toDate);
         }

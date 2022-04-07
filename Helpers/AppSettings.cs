@@ -4,14 +4,24 @@ namespace CovidSledilnik.Helpers
 {
     public class AppSettings
     {
+        /// <summary>
+        /// URL to file source.
+        /// </summary>
         public string URL { get; set; }
-        public string Username { get; set; }
-        public string Password { get; set; }
-        public List<string> Regions { get; set; }
 
-        public AppSettings()
-        {
-            Regions = new List<string>();
-        }    
+        /// <summary>
+        /// Username for Basic Authentication.
+        /// </summary>
+        public string Username { get; set; }
+
+        /// <summary>
+        /// Password for Basic Authentication.
+        /// </summary>
+        public string Password { get; set; }
+        
+        /// <summary>
+        /// List of regions that are avalible to choose.
+        /// </summary>
+        public List<string> Regions { get; set; }
     }
 }

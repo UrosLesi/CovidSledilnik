@@ -13,7 +13,7 @@ namespace CovidSledilnik.Services
         /// <param name="fromDate"></param>
         /// <param name="toDate"></param>
         /// <returns>List of Cases for specific region in specific timeline.</returns>
-        IEnumerable<Cases> FromToDate(string region, DateTime fromDate, DateTime toDate);
+        IEnumerable<Cases> FromToDate(string region, DateTime? fromDate, DateTime? toDate);
 
         /// <summary>
         /// Get a list of objects that contains region and active cases in the past week.

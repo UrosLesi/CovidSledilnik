@@ -26,13 +26,10 @@ namespace CovidSledilnik.Services
         }
 
         ///  <inheritdoc />
-        public IEnumerable<Cases> FromToDate(string region, DateTime fromDate, DateTime toDate)
+        public IEnumerable<Cases> FromToDate(string region, DateTime? fromDate, DateTime? toDate)
         {
             if (!_appSettings.Regions.Contains(region.ToUpperInvariant()))
                 throw new ArgumentException($"Region {region} don't exists.", region);
-
-            if (fromDate > toDate)
-                throw new ArgumentException($"{fromDate} cannot be greater then {toDate}", "fromDate");
 
             var results = new List<Cases>();
 
@@ -50,7 +47,7 @@ namespace CovidSledilnik.Services
                 results.Add(new Cases()
                 {
                     Date = DateTime.Parse(date),
-                    Region = region,
+                    Region = region.ToUpperInvariant(),
                     NumberActive = activeCases == "" ? 0 : int.Parse(activeCases),
                     VaccinatedFirst = vaccinatedFirst == "" ? 0 : int.Parse(vaccinatedFirst),
                     VaccinatedSecond = vaccinatedSecond == "" ? 0 : int.Parse(vaccinatedSecond),
@@ -58,12 +55,49 @@ namespace CovidSledilnik.Services
                 });
             }
 
-            if (!results.Any(r => r.Date == fromDate) || !results.Any(r => r.Date == toDate))
-                throw new ArgumentException($"Parameter {fromDate} or {toDate} dosen't exist in a file.");
+            if (fromDate != null && toDate != null)
+            {
+                if (fromDate > toDate)
+                    throw new ArgumentException($"{fromDate} cannot be larger then {toDate}", "fromDate");
 
-            var cases = results
+                if (!results.Any(r => r.Date == fromDate) || !results.Any(r => r.Date == toDate))
+                    throw new ArgumentException($"Parameter {fromDate} or {toDate} dosen't exist in a file.");
+
+                var casesDate = results
                         .Where(c => c.Date >= fromDate && c.Date <= toDate)
                         .ToList();
+
+                return casesDate;
+            }
+
+            else if (fromDate != null && toDate == null)
+            {
+                if (fromDate > toDate)
+                    throw new ArgumentException($"{fromDate} cannot be larger then {toDate}", "fromDate");
+
+                if (!results.Any(r => r.Date == fromDate))
+                    throw new ArgumentException($"Parameter {fromDate} dosen't exist in a file.");
+
+                var casesDate = results
+                        .Where(c => c.Date >= fromDate)
+                        .ToList();
+
+                return casesDate;
+            }
+
+            else if (fromDate == null && toDate != null)
+            {
+                if (!results.Any(r => r.Date == toDate))
+                    throw new ArgumentException($"Parameter {toDate} dosen't exist in a file.");
+
+                var casesDate = results
+                        .Where(c => c.Date <= toDate)
+                        .ToList();
+
+                return casesDate;
+            }
+
+            var cases = results;
 
             return cases;
         }
@@ -104,6 +138,7 @@ namespace CovidSledilnik.Services
 
             return lastWeekActive.OrderByDescending(x => x.ActiveCases).ToList();
         }
+
         private void GetCSV()
         {
             HttpWebRequest req = (HttpWebRequest)WebRequest.Create(_appSettings.URL);
