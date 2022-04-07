@@ -1,7 +1,7 @@
 ﻿namespace CovidSledilnik.Models
 {
     /// <summary>
-    /// Model for presenting number of cases in specific refion for past week.
+    /// Model for presenting number of cases in specific region for past week.
     /// </summary>
     public class LastWeekRegion
     {

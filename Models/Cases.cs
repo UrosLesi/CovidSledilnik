@@ -3,7 +3,7 @@
 namespace CovidSledilnik.Models
 {
     /// <summary>
-    /// Model for presenting data about COVID for specific date.
+    /// Model for presenting data about COVID for specific region.
     /// </summary>
     public class Cases
     {

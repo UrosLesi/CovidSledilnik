@@ -24,7 +24,7 @@ namespace CovidSledilnik.Controllers
         }
 
         /// <summary>
-        /// On this endpoint User gets data from specific time frame and based on region that he specified.
+        /// This endpoint gets data from specific time frame and based on region if specified. 
         /// </summary>
         /// <param name="region">Regions: LJ, CE, KR, NM, KK, KP, MB, MS, NG, PO, SG, ZA</param>
         /// <param name="fromDate">E.g.: 2022-03-28</param>
@@ -36,13 +36,16 @@ namespace CovidSledilnik.Controllers
         [HttpGet("cases")]
         [ProducesResponseType(typeof(IEnumerable<Cases>), 200)]
         [ProducesResponseType(500)]
-        public IEnumerable<Cases> GetFromToDate([BindRequired] string region, DateTime? fromDate, DateTime? toDate)
+        public IEnumerable<Cases> GetFromToDate(string region, DateTime? fromDate, DateTime? toDate)
         {
-            return _covidSledilnikService.FromToDate(region, fromDate, toDate);
+            if (region != null)
+                return _covidSledilnikService.FromToDateRegion(region, fromDate, toDate);
+
+            return _covidSledilnikService.FromToDate(fromDate, toDate);
         }
 
         /// <summary>
-        /// On this endpoint User gets a data from CSV file for last seven days and the are order descendingly.
+        /// This endpoint User gets a data from CSV file for last seven days and the are order descendingly.
         /// </summary>
         /// <returns>Descendingly orderd list of objects with number of active cases in past week for each region.</returns>
         /// <response code="200">Last week active cases found</response>

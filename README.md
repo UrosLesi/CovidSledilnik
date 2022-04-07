@@ -15,7 +15,6 @@ Endpoint cases supports three query parameters: region, fromDate and toDate and 
 - Number of vaccinated 2nd
 - Deceased to date
 
-Of all three paramters only region is requiered.
 Avalible regions can be modified in appsettings.json.
 
 On endpoint lastweek we get resultset that contains a list of regions with sum of active cases from the last week.

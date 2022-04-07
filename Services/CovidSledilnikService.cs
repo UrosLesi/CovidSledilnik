@@ -26,7 +26,7 @@ namespace CovidSledilnik.Services
         }
 
         ///  <inheritdoc />
-        public IEnumerable<Cases> FromToDate(string region, DateTime? fromDate, DateTime? toDate)
+        public IEnumerable<Cases> FromToDateRegion(string region, DateTime? fromDate, DateTime? toDate)
         {
             if (!_appSettings.Regions.Contains(region.ToUpperInvariant()))
                 throw new ArgumentException($"Region {region} don't exists.", region);
@@ -100,6 +100,103 @@ namespace CovidSledilnik.Services
             var cases = results;
 
             return cases;
+        }
+
+        ///  <inheritdoc />
+        public IEnumerable<Cases> FromToDate(DateTime? fromDate, DateTime? toDate)
+        {
+            Dictionary<string, List<Cases>> results = new Dictionary<string, List<Cases>>();
+            var resultsList = new List<Cases>();
+
+            _csvReader.Read();
+            _csvReader.ReadHeader();
+
+            while (_csvReader.Read())
+            {
+                foreach (var region in _appSettings.Regions)
+                {
+                    var date = _csvReader.GetField("date");
+                    var activeCases = _csvReader.GetField("region." + region.ToLowerInvariant() + ".cases.active");
+                    var vaccinatedFirst = _csvReader.GetField("region." + region.ToLowerInvariant() + ".vaccinated.1st.todate");
+                    var vaccinatedSecond = _csvReader.GetField("region." + region.ToLowerInvariant() + ".vaccinated.2nd.todate");
+                    var deceased = _csvReader.GetField("region." + region.ToLowerInvariant() + ".deceased.todate");
+
+                    if (results.ContainsKey(region))
+                    {
+                        results[region].Add(new Cases()
+                        {
+                            Date = DateTime.Parse(date),
+                            Region = region.ToUpperInvariant(),
+                            NumberActive = activeCases == "" ? 0 : int.Parse(activeCases),
+                            VaccinatedFirst = vaccinatedFirst == "" ? 0 : int.Parse(vaccinatedFirst),
+                            VaccinatedSecond = vaccinatedSecond == "" ? 0 : int.Parse(vaccinatedSecond),
+                            DeceasedToDate = deceased == "" ? 0 : int.Parse(deceased)
+                        });
+                    }
+
+                    else
+                    {
+                        results[region] = new List<Cases>() { new Cases()
+                        {
+                            Date = DateTime.Parse(date),
+                            Region = region.ToUpperInvariant(),
+                            NumberActive = activeCases == "" ? 0 : int.Parse(activeCases),
+                            VaccinatedFirst = vaccinatedFirst == "" ? 0 : int.Parse(vaccinatedFirst),
+                            VaccinatedSecond = vaccinatedSecond == "" ? 0 : int.Parse(vaccinatedSecond),
+                            DeceasedToDate = deceased == "" ? 0 : int.Parse(deceased)
+                        } };
+                    }
+                }
+            }
+
+            foreach (var region in _appSettings.Regions)
+            {
+                resultsList.AddRange(results[region]);
+            }
+
+            if (fromDate != null && toDate != null)
+            {
+                if (fromDate > toDate)
+                    throw new ArgumentException($"{fromDate} cannot be larger then {toDate}", "fromDate");
+
+                if (!resultsList.Any(r => r.Date == fromDate) || !resultsList.Any(r => r.Date == toDate))
+                    throw new ArgumentException($"Parameter {fromDate} or {toDate} dosen't exist in a file.");
+
+                var casesDate = resultsList
+                        .Where(c => c.Date >= fromDate && c.Date <= toDate)
+                        .ToList();
+
+                return casesDate;
+            }
+
+            else if (fromDate != null && toDate == null)
+            {
+                if (fromDate > toDate)
+                    throw new ArgumentException($"{fromDate} cannot be larger then {toDate}", "fromDate");
+
+                if (!resultsList.Any(r => r.Date == fromDate))
+                    throw new ArgumentException($"Parameter {fromDate} dosen't exist in a file.");
+
+                var casesDate = resultsList
+                        .Where(c => c.Date >= fromDate)
+                        .ToList();
+
+                return casesDate;
+            }
+
+            else if (fromDate == null && toDate != null)
+            {
+                if (!resultsList.Any(r => r.Date == toDate))
+                    throw new ArgumentException($"Parameter {toDate} dosen't exist in a file.");
+
+                var casesDate = resultsList
+                        .Where(c => c.Date <= toDate)
+                        .ToList();
+
+                return casesDate;
+            }
+
+            return resultsList;
         }
 
         ///  <inheritdoc />
